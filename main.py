@@ -1,0 +1,264 @@
+from flask import Flask, flash, redirect, render_template, request, session
+from flask_wtf import FlaskForm
+from sqlalchemy import ForeignKey
+from wtforms import StringField, SubmitField
+from wtforms.validators import DataRequired
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from wtforms.widgets import TextArea
+from werkzeug.security import generate_password_hash, check_password_hash
+from wtforms.fields import SelectField
+from wtforms.fields import FileField
+
+
+# Create a Flask Instance
+app = Flask(__name__)
+
+# create sql alchemy database
+db = SQLAlchemy()
+
+# Add Database uri to config
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+
+# Secret Key
+app.config["SECRET_KEY"] = "Hemlig nyckel"
+
+# initalize the databse on the app
+db.init_app(app)
+
+
+# Creat User Model (table)
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    user_name = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(150), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# Helper class to take data from html request form and convert to wtf flask form
+class UserForm(FlaskForm):
+    name = StringField("name", validators=[DataRequired()])
+    username = StringField("username", validators=[DataRequired()])
+    password = StringField("password:", validators=[DataRequired()])
+
+
+class Recipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, ForeignKey("users.id"))
+    title = db.Column(db.String(100))
+    ingredients = db.Column(db.Text)
+    instruction = db.Column(db.Text)
+    portions = db.Column(db.Integer)
+    difficulty = db.Column(db.Integer)
+    category = db.Column(db.Integer)
+    date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+    # image = db.Column(db.BLOB)
+
+
+# create tables if not exists
+with app.app_context():
+    db.create_all()
+
+
+class AddRecipeForm(FlaskForm):
+    title = StringField("Receptets namn", validators=[DataRequired()])
+    ingredients = StringField(
+        "Ingredienser och mått", validators=[DataRequired()], widget=TextArea()
+    )
+    instruction = StringField(
+        "Gör så här:", validators=[DataRequired()], widget=TextArea()
+    )
+    dropdown1_choices = [
+        ("", "Antal portioner"),
+        ("1", "1"),
+        ("2", "2"),
+        ("3", "4"),
+        ("4", "6"),
+        ("5", "8"),
+    ]
+    portions = SelectField(
+        "Antal portioner", choices=dropdown1_choices, validators=[DataRequired()]
+    )
+    dropdown2_choices = [
+        ("", "Svårighetsgrad:"),
+        ("1", "Lätt"),
+        ("2", "Medel"),
+        ("3", "Svårt"),
+    ]
+    difficulty = SelectField(
+        "Svårighetsgrad", choices=dropdown2_choices, validators=[DataRequired()]
+    )
+    dropdown3_choices = [
+        ("", "Kategori"),
+        ("1", "Kyckling"),
+        ("2", "Fisk"),
+        ("3", "Kött"),
+        ("4", "Vegetariskt"),
+        ("5", "Veganskt"),
+        ("6", "Pasta"),
+        ("7", "Pizza"),
+    ]
+    category = SelectField(
+        "Kategori", choices=dropdown3_choices, validators=[DataRequired()]
+    )
+    submit = SubmitField("Lägg upp!")
+    # image = FileField()
+
+
+@app.route("/")
+def home():
+    # Get the posts from the database
+    isAuthorized = session.get("Authorized", default=False)
+    recipes = Recipe.query.order_by(Recipe.date_posted.desc()).all()
+
+    for rec in recipes:
+        if rec.difficulty == 1:
+            rec.difficulty = "Lätt"
+        elif rec.difficulty == 2:
+            rec.difficulty = "Medel"
+        elif rec.difficulty == 3:
+            rec.difficulty = "Svårt"
+
+    return render_template("index.html", isAuthorized=isAuthorized, recipes=recipes)
+
+
+@app.route("/add", methods=["GET", "POST"])
+def add_recipe():
+    user_id = session.get("user_id")
+    isAuthorized = session.get("Authorized", default=False)
+    if not isAuthorized:
+        return render_template("index.html")
+    else:
+        form = AddRecipeForm()
+
+        if request.method == "POST":
+            post = Recipe(
+                user_id=user_id,
+                title=form.title.data,
+                ingredients=form.ingredients.data,
+                instruction=form.instruction.data,
+                portions=form.portions.data,
+                difficulty=form.difficulty.data,
+                category=form.category.data,
+                # image=form.image.data
+            )
+
+            # Clear the form
+            form.title.data = ""
+            form.ingredients.data = ""
+            form.instruction.data = ""
+            form.portions.data = ""
+            form.difficulty.data = ""
+            form.category.data = ""
+            # form.image.data = ""
+
+            # Add recipe to database
+            db.session.add(post)
+            db.session.commit()
+
+            flash("Ditt recept är upplagt på hemsidan!")
+
+        return render_template("add_recipe.html", isAuthorized=isAuthorized, form=form)
+
+
+@app.route("/detail/<int:id>")
+def recipe_detail(id):
+    isAuthorized = session.get("Authorized", default=False)
+    recipe = Recipe.query.get_or_404(id)
+    return render_template(
+        "recipe_detail.html", isAuthorized=isAuthorized, recipe=recipe
+    )
+
+
+@app.route("/detail/delete/<int:id>")
+def delete_recipe(id):
+    # Retrieve the logged-in user's ID
+    user_id = session.get("user_id")
+
+    # Fetch the recipe to be deleted
+    recipe_to_delete = Recipe.query.get_or_404(id)
+
+    try:
+        # Check if the logged-in user's ID matches the user ID associated with the recipe
+        if recipe_to_delete.user_id == user_id:
+            # Delete the recipe if the user IDs match
+            db.session.delete(recipe_to_delete)
+            db.session.commit()
+            flash("Ditt recept har raderats.")
+        else:
+            # If the user IDs don't match, show an error message
+            flash("Du har inte behörighet att radera detta recept.")
+
+        # Redirect to the home page
+        return redirect("/")
+
+    except Exception as e:
+        # Return an error message if an exception occurs during deletion
+        flash("Det gick inte att radera receptet, försök igen!")
+        return redirect("/")
+
+
+@app.route("/signup", methods=["GET", "POST"])
+def sign_up():
+    userForm = UserForm()
+    if request.method == "POST":
+        # convert to fixed flask data
+        password_hash = generate_password_hash(userForm.password.data)
+        # create user model instance to add to the database
+        user = Users(
+            name=userForm.name.data,
+            user_name=userForm.username.data,
+            password=password_hash,
+        )
+
+        if user.name is not None and user.user_name is not None:
+            # add user to the database
+            db.session.add(user)
+            db.session.commit()
+            flash("Ditt konto har skapats")
+            return redirect("/signin")
+
+    else:
+        return render_template("sign_up.html", userForm=userForm)
+
+
+@app.route("/signin", methods=["POST", "GET"])
+def sign_in():
+    # clear session (Log out)
+    session.clear()
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Fetch the user from the database by username
+        user = Users.query.filter_by(user_name=username).first()
+        if user:
+            # comparing user's password with entered password
+            match = check_password_hash(user.password, password)
+            if match == True:
+                # start a new session for the user while he is logged in
+                session["Authorized"] = True
+                session["user_id"] = user.id  # Add user-ID to the session
+                session["user_name"] = username
+                return redirect("/")
+            else:
+                # Password is incorrect
+                flash("Lösenord matchar inte. Försök igen.")
+                return render_template("sign_in.html")
+        else:
+            # user does not exists
+            flash("Felaktiga Inloggningsuppgiter, Försök igen!!!.")
+            return render_template("sign_in.html")
+    else:
+        return render_template("sign_in.html")
+
+
+@app.route("/re")
+def re():
+    return redirect("/")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
+

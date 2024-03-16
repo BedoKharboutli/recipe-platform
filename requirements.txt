@@ -1,0 +1,5 @@
+Flask
+wtforms
+werkzeug
+Flask-WTF
+flask_sqlalchemy
