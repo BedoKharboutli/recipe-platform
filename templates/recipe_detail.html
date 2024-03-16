@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="main-recipe">
+    <div class="card mb-3">
+        <div class="row g-0">
+            <div class="col-md-4 h-400">
+                <img src="/static/pexels-lisa-fotios-1279330.jpg" alt="Picture of a pasta dish"
+                class="img-fluid rounded-start" style="object-fit: cover; height: 100%; width: 100%;">
+            </div>
+            <div class="col-md-8 p-3">
+                <div class="card-body">
+                    <div class="flex-grow-1">
+                        <h4 class="card-title mb-0">{{ recipe.title }}</h4><br>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <strong>Portioner:</strong><br>
+                                    <!-- <p>{{ recipe.portions }}</p> -->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <strong>Svårighetsgrad:</strong><br>
+                                    <!-- <p>{{ recipe.difficulty }}</p> -->
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-4">
+                                    <strong>Kategori:</strong><br>
+                                    <!-- <p>{{ recipe.category }}</p> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="float-right">
+                            <br>
+                            <a href="{{ url_for ('delete_recipe', id=recipe.id) }}"
+                                class="btn btn-custom-secondary btn crud-btn-text">Radera Recept</a>
+                        </div>
+                    </div>
+                    <div id="recipe-ud-btn"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card mb-3">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card-body">
+                    <h5>Ingredienser:</h5>
+                    <ul>
+                        {% for ingredient in recipe.ingredients.split('\n') %}
+                        <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h5>Instruktioner:</h5>
+                    {% for step in recipe.instruction.split('\n') %}
+                    <p>{{ step }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+
+{% endblock %}

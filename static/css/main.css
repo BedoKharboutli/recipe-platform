@@ -1,0 +1,173 @@
+body {
+  background-color: #fafafa;
+  font-family: "Montserrat", sans-serif;
+  color: #363935;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: #363935;
+}
+
+.hidden {
+  display: none;
+}
+
+.hero {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero::before {
+  content: "";
+  background-image: url("/static/pexels-ella-olsson-1640772.jpg");
+  background-size: cover;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  opacity: 0.2;
+}
+
+.container-fluid {
+  background-color: #fafafa;
+  font-size: 20px;
+  margin: 5px;
+  font-size: 19px;
+}
+
+.container-fluid:hover {
+  color: #953a17;
+}
+
+.navbar {
+  z-index: 1000;
+}
+
+.navbar-brand {
+  font-size: 30px;
+  font-weight: bold;
+  color: #953a17;
+}
+
+.navbar-brand:hover {
+  color: #b87054;
+}
+
+.btn {
+  background-color: #953a17;
+  color: #fafafa;
+}
+
+.btn:hover {
+  color: #953a17;
+}
+
+.btn-custom-secondary {
+  text-align: right;
+}
+
+.card {
+  margin-right: 30px;
+  margin-left: 30px;
+  padding: 10px;
+}
+
+#userForm {
+  line-height: 30px;
+  margin-top: 50px;
+}
+
+.post-link {
+  color: #363935;
+  text-decoration: none;
+}
+
+.post-link:hover {
+  color: #953a17;
+  text-decoration: none;
+  
+}
+
+@media only screen and (max-width: 480px) {
+  /* Add styles for screens with a maximum width of 480px (phones) */
+  .container-fluid {
+    font-size: 14px;
+  }
+
+  .row.cards-container {
+    margin-top: 800px;
+  }
+
+  .navbar {
+    padding: 10px;
+  }
+
+  .navbar-brand {
+    font-size: 20px;
+  }
+
+  .navbar-toggler {
+    color: #953a17;
+    border-color: #953a17;
+  }
+
+  .navbar-nav {
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .navbar-nav a {
+    display: block;
+    padding: 10px;
+    color: #953a17;
+    text-decoration: none;
+  }
+
+  .navbar-nav a:hover {
+    background-color: #fafafa;
+    color: #b87054;
+  }
+
+  .add-recipe {
+    margin-top: 100px;
+  }
+
+  /* Adjust other styles as needed for smaller screens */
+}
+
+/* Media Queries */
+@media only screen and (max-width: 768px) {
+  /* Add styles for screens with a maximum width of 768px */
+  .container-fluid {
+    font-size: 16px;
+  }
+
+  .navbar-brand {
+    font-size: 24px;
+  }
+
+  .add-recipe {
+    margin-top: 100px;
+  }
+}
+
+@media screen and (min-width: 1900px) {
+  .container {
+    width: 1870px;
+  }
+
+  .main-recipe {
+    margin-top: 100px;
+    margin-bottom: 50px;
+  }
+
+}

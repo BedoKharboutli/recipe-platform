@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Karla&family=Montserrat:wght@300&display=swap"
+      rel="stylesheet"
+      media="all"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main.css') }}"
+    />
+
+    <title>RECEPTLÅDAN</title>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('home') }}">RECEPTLÅDAN</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a
+                class="nav-link active unauthorized"
+                aria-current="page"
+                href="{{ url_for('sign_up') }}"
+                >Skapa Konto</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active unauthorized"
+                aria-current="page"
+                href="{{ url_for('sign_in') }}"
+                >Logga In</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active authorized"
+                aria-current="page"
+                href="{{ url_for('sign_in') }}"
+                >Logga ut</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active authorized"
+                aria-current="page"
+                href="{{ url_for('add_recipe') }}"
+                >Skapa Recept</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Kategorier
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Kyckling</a></li>
+                <li><a class="dropdown-item" href="#">Fisk</a></li>
+                <li><a class="dropdown-item" href="#">Kött</a></li>
+                <li><a class="dropdown-item" href="#">Vegetariskt</a></li>
+                <li><a class="dropdown-item" href="#">Veganskt</a></li>
+                <li><a class="dropdown-item" href="#">Pasta</a></li>
+                <li><a class="dropdown-item" href="#">Pizza</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="d-flex" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Sök"
+              aria-label="Search"
+            />
+            <button class="btn" type="submit">Sök</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div>
+      {% for mesg in get_flashed_messages() %}
+      <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong></strong> {{ mesg }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="hero">{% block body %} {% endblock %}</div>
+
+    <script>
+      var isAuthorized = "{{ isAuthorized }}";
+      const unauthorized = document.getElementsByClassName("unauthorized");
+      const authorized = document.getElementsByClassName("authorized");
+
+      if (isAuthorized == "True") {
+        for (const item of unauthorized) {
+          item.classList.add("hidden");
+        }
+      } else {
+        for (const item of authorized) {
+          item.classList.add("hidden");
+        }
+      }
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+      integrity="sha384-JVNsvvFoaNuQbSS0SBD6z50jFXwPei51WqAy6DLmNcDLGT9eAf5k4fA2P04Hg2L4"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

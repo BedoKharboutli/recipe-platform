@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block body %}
+<div class="user_info">
+  <div class="vw-100">
+    <div class="card mb-1">
+      <div class="col-md-8 p-3">
+        <div class="card-body">
+          <div class="container-fluid">
+            <h3>Logga in</h3>
+            <form id="userForm" method="post">
+              <table>
+                <tr>
+                  <th><label for="username">Användarnamn: </label></th>
+                  <td><input type="text" id="username" name="username" required /></td>
+                </tr>
+                <tr>
+                  <th><label for="password">Lösenord: </label></th>
+                  <td><input type="password" id="password" name="password" required /></td>
+                </tr>
+              </table>
+              <br />
+              <button class="btn" type="submit">Logga in</button>
+              <button class="btn" type="button" onclick="cancel()">
+                Avbryt
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

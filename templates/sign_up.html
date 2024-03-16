@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block body %}
+
+<div class="user_info">
+  <div class="vw-100">
+    <div class="card mb-1">
+      <div class="col-md-8 p-3">
+        <div class="card-body">
+          <div class="container-fluid">
+            <h3>Skapa användare</h3>
+            <form id="userForm" method="post">
+              <table>
+                <tr>
+                  <th><label for="name">Namn: </label></th>
+                  <td><input autofocus type="text" id="name" name="name" required /></td>
+                  <th><label for="username">Användarnamn: </label></th>
+                  <td><input type="text" id="username" name="username" required /></td>
+                </tr>
+                <tr>
+                  <th><label for="password">Lösenord: </label></th>
+                  <td><input type="password" class="password" name="password" required /></td>
+                  <th><label for="password">Upprepa lösenord: </label></th>
+                  <td><input type="password" class="password" name="password" required /></td>
+                </tr>
+              </table>
+              <br>
+              <button class="btn" type="submit">Skapa användare</button>
+              <button class="btn" type="button" onclick="cancel()">
+                Avbryt
+              </button>
+            </form>
+          </div>
+
+          <script>
+            //Check if the passwords are the same
+            function validateForm() {
+              var password = document.getElementsByClassName("password").value;
+              var confirm_password =
+                document.getElementsByClassName("password").value;
+
+              if (password != confirm_password) {
+                alert("Lösenord matchar inte. Vänligen försök igen.");
+                return false;
+              }
+              return true;
+            }
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} # all = Users.query.all() # for user in all: # print(user.id) #
+print(user.name) # Users.query.filter_by(id=1).delete() # db.session.commit()
