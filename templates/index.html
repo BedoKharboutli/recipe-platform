@@ -1,5 +1,6 @@
 {% extends "base.html" %} {% block body %}
 <br />
+
 <div class="row row-cols-1 row-cols-md-2 g-4 cards-container">
   <!-- For loop to list all recipes -->
   {% for recipe in recipes %}
@@ -10,13 +11,14 @@
         src="{{ recipe.image }}"
         class="card-img-top"
         alt="{{ recipe.title }}"
-        style="margin-bottom: 5px"
+        style="margin-bottom: 5px; position: relative; height: 180px"
       />
       <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="post-link">
-        <h3 class="card-title">{{ recipe.title }}</h3>
+        <h3 style="font-size: x-large; color: black" class="card-title">
+          {{ recipe.title }}
+        </h3>
       </a>
       <p>Portioner: {{ recipe.portions }}</p>
-      <p>Svårighetsgrad: {{ recipe.difficulty }}</p>
     </div>
   </div>
   {% endfor %}
