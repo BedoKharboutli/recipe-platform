@@ -1,19 +1,22 @@
-{% extends "base.html" %}
-
-{% block body %}
-<br>
+{% extends "base.html" %} {% block body %}
+<br />
 <div class="row row-cols-1 row-cols-md-2 g-4 cards-container">
   <!-- For loop to list all recipes -->
   {% for recipe in recipes %}
-  
-  <div class="card" style="width: 18rem; height: 22rem;">
+
+  <div class="card" style="width: 18rem; height: 22.5rem">
     <div class="card-body">
-      <img src="/static/pexels-lisa-fotios-1279330.jpg" class="card-img-top" alt="..." style="margin-bottom: 5px;">
+      <img
+        src="/static/pexels-lisa-fotios-1279330.jpg"
+        class="card-img-top"
+        alt="..."
+        style="margin-bottom: 5px"
+      />
       <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="post-link">
         <h3 class="card-title">{{ recipe.title }}</h3>
       </a>
 
-      <p>Portioner:</p>
+      <p>Portioner: {{recipe.portions }}</p>
       <p>Svårighetsgrad: {{recipe.difficulty }}</p>
     </div>
   </div>
