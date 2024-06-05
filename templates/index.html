@@ -7,17 +7,16 @@
   <div class="card" style="width: 18rem; height: 22.5rem">
     <div class="card-body">
       <img
-        src="/static/pexels-lisa-fotios-1279330.jpg"
+        src="{{ recipe.image }}"
         class="card-img-top"
-        alt="..."
+        alt="{{ recipe.title }}"
         style="margin-bottom: 5px"
       />
       <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="post-link">
         <h3 class="card-title">{{ recipe.title }}</h3>
       </a>
-
-      <p>Portioner: {{recipe.portions }}</p>
-      <p>Svårighetsgrad: {{recipe.difficulty }}</p>
+      <p>Portioner: {{ recipe.portions }}</p>
+      <p>Svårighetsgrad: {{ recipe.difficulty }}</p>
     </div>
   </div>
   {% endfor %}

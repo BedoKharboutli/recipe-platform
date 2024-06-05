@@ -9,6 +9,8 @@ from wtforms.widgets import TextArea
 from werkzeug.security import generate_password_hash, check_password_hash
 from wtforms.fields import SelectField
 from wtforms.fields import FileField
+import os
+from werkzeug.utils import secure_filename
 
 
 # Create a Flask Instance
@@ -19,6 +21,9 @@ db = SQLAlchemy()
 
 # Add Database uri to config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
+UPLOAD_FOLDER = "static/uploads/"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
 
 # Secret Key
 app.config["SECRET_KEY"] = "Hemlig nyckel"
@@ -53,7 +58,7 @@ class Recipe(db.Model):
     difficulty = db.Column(db.Integer)
     category = db.Column(db.Integer)
     date_posted = db.Column(db.DateTime, default=datetime.utcnow)
-    # image = db.Column(db.BLOB)
+    image = db.Column(db.String(100))  # Path to the image file
 
 
 # create tables if not exists
@@ -69,41 +74,48 @@ class AddRecipeForm(FlaskForm):
     instruction = StringField(
         "Gör så här:", validators=[DataRequired()], widget=TextArea()
     )
-    dropdown1_choices = [
-        ("", "Antal portioner"),
-        ("1", "1"),
-        ("2", "2"),
-        ("3", "4"),
-        ("4", "6"),
-        ("5", "8"),
-    ]
     portions = SelectField(
-        "Antal portioner", choices=dropdown1_choices, validators=[DataRequired()]
+        "Antal portioner",
+        choices=[
+            ("", "Antal portioner"),
+            ("1", "1"),
+            ("2", "2"),
+            ("3", "4"),
+            ("4", "6"),
+            ("5", "8"),
+        ],
+        validators=[DataRequired()],
     )
-    dropdown2_choices = [
-        ("", "Svårighetsgrad:"),
-        ("1", "Lätt"),
-        ("2", "Medel"),
-        ("3", "Svårt"),
-    ]
     difficulty = SelectField(
-        "Svårighetsgrad", choices=dropdown2_choices, validators=[DataRequired()]
+        "Svårighetsgrad",
+        choices=[
+            ("", "Svårighetsgrad:"),
+            ("1", "Lätt"),
+            ("2", "Medel"),
+            ("3", "Svårt"),
+        ],
+        validators=[DataRequired()],
     )
-    dropdown3_choices = [
-        ("", "Kategori"),
-        ("1", "Kyckling"),
-        ("2", "Fisk"),
-        ("3", "Kött"),
-        ("4", "Vegetariskt"),
-        ("5", "Veganskt"),
-        ("6", "Pasta"),
-        ("7", "Pizza"),
-    ]
     category = SelectField(
-        "Kategori", choices=dropdown3_choices, validators=[DataRequired()]
+        "Kategori",
+        choices=[
+            ("", "Kategori"),
+            ("1", "Kyckling"),
+            ("2", "Fisk"),
+            ("3", "Kött"),
+            ("4", "Vegetariskt"),
+            ("5", "Veganskt"),
+            ("6", "Pasta"),
+            ("7", "Pizza"),
+        ],
+        validators=[DataRequired()],
     )
+    image = FileField("Lägg upp en bild på din rätt:", validators=[DataRequired()])
     submit = SubmitField("Lägg upp!")
-    # image = FileField()
+
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route("/")
@@ -131,33 +143,32 @@ def add_recipe():
         return render_template("index.html")
     else:
         form = AddRecipeForm()
-
         if request.method == "POST":
-            post = Recipe(
-                user_id=user_id,
-                title=form.title.data,
-                ingredients=form.ingredients.data,
-                instruction=form.instruction.data,
-                portions=form.portions.data,
-                difficulty=form.difficulty.data,
-                category=form.category.data,
-                # image=form.image.data
-            )
+            if "image" not in request.files:
+                flash("No file part")
+                return redirect(request.url)
+            file = request.files["image"]
+            if file.filename == "":
+                flash("No selected file")
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-            # Clear the form
-            form.title.data = ""
-            form.ingredients.data = ""
-            form.instruction.data = ""
-            form.portions.data = ""
-            form.difficulty.data = ""
-            form.category.data = ""
-            # form.image.data = ""
+                post = Recipe(
+                    user_id=user_id,
+                    title=form.title.data,
+                    ingredients=form.ingredients.data,
+                    instruction=form.instruction.data,
+                    portions=form.portions.data,
+                    difficulty=form.difficulty.data,
+                    category=form.category.data,
+                    image=os.path.join(app.config["UPLOAD_FOLDER"], filename),
+                )
 
-            # Add recipe to database
-            db.session.add(post)
-            db.session.commit()
-
-            flash("Ditt recept är upplagt på hemsidan!")
+                db.session.add(post)
+                db.session.commit()
+                flash("Ditt recept är upplagt på hemsidan!")
 
         return render_template("add_recipe.html", isAuthorized=isAuthorized, form=form)
 

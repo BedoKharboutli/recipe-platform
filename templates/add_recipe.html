@@ -1,65 +1,63 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block body %} {{ form.hidden_tag() }}
 
-
-
-{% block body %}
-{{ form.hidden_tag() }}
-
-<div class="container-fluid add-recipe" style="padding-top: 300px; margin-bottom: 100px;">
-    <div class="vw-100">
-        <div class="card mb-1">
-            <div class="col-md-8 p-3">
-            <form id="form" method="POST">
-                        <div class="card-body">
-                            <div class="flex-grow-1">
-                                <h4 class="card-title mb-0">Lägg in ditt recept</h4><br>
-                                <div class="mb-3">
-                                    <label  class="form-label"><strong>Receptets namn:</strong></label>
-                                    {{ form.title(class="form-control") }}
-                        </div>
-                                <div class="mb-3">
-                                    <label for="ingredients" class="form-label"><strong>Ingredienser:</strong></label>
-                                    {{ form.ingredients(class="form-control", placeholder="2 dl Vatten \n300g Pasta", rows="7") }}
-                                </div>
-                                <div class="mb-3">
-                                    <label for="instruction" class="form-label"><strong>Gör så här:</strong></label>
-                                    {{ form.instruction(class="form-control", placeholder="1. Koka upp vattnet \n2. Tillsätt pasta", rows="7") }}
-                        </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="mb-4">
-                                            <strong>Portioner:</strong><br>
-                                            {{ form.portions(class="form-select", id="portions") }}
-
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-4">
-                                            <strong>Svårighetsgrad:</strong><br>
-                                            {{ form.difficulty(class="form-select", id="difficulty") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-4">
-                                            <strong>Kategori:</strong><br>
-                                            {{ form.category(class="form-select", id="category") }}
-                                        </div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="imageFile" class="form-label">Lägg upp en bild på din rätt:</label>
-                                        <input class="form-control" type="file" id="imageFile">
-                                    </div>
-                                    </div>
-                        </div>
-                    </div>
-                    {{ form.submit(class="btn btn-secondary") }}
-                </form>
-            </div>
-            </div>
+<form
+  style="padding-top: 150px; margin-bottom: 100px"
+  id="form"
+  class="add-recipe card mb-1"
+  method="POST"
+  enctype="multipart/form-data"
+>
+  <div class="card-body">
+    <div class="flex-grow-1">
+      <h4 class="card-title mb-0">Lägg in ditt recept</h4>
+      <br />
+      <div class="mb-3">
+        <label class="form-label"><strong>Receptets namn:</strong></label>
+        {{ form.title(class="form-control") }}
+      </div>
+      <div class="mb-3">
+        <label for="ingredients" class="form-label"
+          ><strong>Ingredienser:</strong></label
+        >
+        {{ form.ingredients(class="form-control", placeholder="2 dl Vatten
+        \n300g Pasta", rows="7") }}
+      </div>
+      <div class="mb-3">
+        <label for="instruction" class="form-label"
+          ><strong>Gör så här:</strong></label
+        >
+        {{ form.instruction(class="form-control", placeholder="1. Koka upp
+        vattnet \n2. Tillsätt pasta", rows="7") }}
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="mb-4">
+            <strong>Portioner:</strong><br />
+            {{ form.portions(class="form-select", id="portions") }}
+          </div>
         </div>
+        <div class="col-md-4">
+          <div class="mb-4">
+            <strong>Svårighetsgrad:</strong><br />
+            {{ form.difficulty(class="form-select", id="difficulty") }}
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="mb-4">
+            <strong>Kategori:</strong><br />
+            {{ form.category(class="form-select", id="category") }}
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="image" class="form-label"
+            >Lägg upp en bild på din rätt:</label
+          >
+          {{ form.image(class="form-control") }}
+        </div>
+      </div>
     </div>
-</div>
-
-
+  </div>
+  {{ form.submit(class="btn btn-secondary") }}
+</form>
 
 {% endblock %}
