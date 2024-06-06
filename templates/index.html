@@ -5,7 +5,15 @@
   <!-- For loop to list all recipes -->
   {% for recipe in recipes %}
 
-  <div class="card" style="width: 18rem; height: 22.5rem">
+  <div
+    class="card"
+    style="
+      width: 18rem;
+      height: 22.5rem;
+      border-radius: 30px;
+      background-color: rgb(248, 243, 237);
+    "
+  >
     <div class="card-body">
       <img
         src="{{ recipe.image }}"

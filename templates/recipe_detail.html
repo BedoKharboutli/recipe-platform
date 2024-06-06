@@ -5,9 +5,9 @@
     <div class="row g-0">
       <div class="col-md-4 h-400">
         <img
-          src="{{ recipe.image }}"
+          src="{{ url_for('static', filename=recipe.image.split('static/')[-1]) }}"
           alt="Picture of {{ recipe.title }}"
-          class="img-fluid rounded-start"
+          class="card-img-top"
           style="object-fit: cover; height: 100%; width: 100%"
         />
       </div>
