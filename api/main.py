@@ -14,7 +14,7 @@ from werkzeug.utils import secure_filename
 
 
 # Create a Flask Instance
-app = Flask(__name__)
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 
 # create sql alchemy database
 db = SQLAlchemy()
