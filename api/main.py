@@ -1,7 +1,7 @@
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_wtf import FlaskForm
 from sqlalchemy import ForeignKey
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField , PasswordField
 from wtforms.validators import DataRequired
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
