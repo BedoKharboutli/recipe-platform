@@ -135,6 +135,72 @@ def home():
     return render_template("index.html", isAuthorized=isAuthorized, recipes=recipes)
 
 
+@app.route("/category/<int:category_id>")
+def recipes_by_category(category_id):
+    # Get recipes filtered by category
+    isAuthorized = session.get("Authorized", default=False)
+    recipes = Recipe.query.filter_by(category=category_id).order_by(Recipe.date_posted.desc()).all()
+    
+    # Category mapping
+    category_names = {
+        1: "Kyckling",
+        2: "Fisk", 
+        3: "Kött",
+        4: "Vegetariskt",
+        5: "Veganskt",
+        6: "Pasta",
+        7: "Pizza"
+    }
+    
+    category_name = category_names.get(category_id, "Okänd kategori")
+    
+    # Convert difficulty numbers to text
+    for rec in recipes:
+        if rec.difficulty == 1:
+            rec.difficulty = "Lätt"
+        elif rec.difficulty == 2:
+            rec.difficulty = "Medel"
+        elif rec.difficulty == 3:
+            rec.difficulty = "Svårt"
+
+    return render_template("index.html", isAuthorized=isAuthorized, recipes=recipes, 
+                         category_name=category_name, category_id=category_id)
+
+
+@app.route("/search", methods=["GET", "POST"])
+def search_recipes():
+    isAuthorized = session.get("Authorized", default=False)
+    
+    if request.method == "POST":
+        search_query = request.form.get("search", "").strip()
+    else:
+        search_query = request.args.get("q", "").strip()
+    
+    if not search_query:
+        # If no search query, redirect to home
+        return redirect("/")
+    
+    # Search in recipe titles and ingredients (case-insensitive)
+    recipes = Recipe.query.filter(
+        db.or_(
+            Recipe.title.ilike(f"%{search_query}%"),
+            Recipe.ingredients.ilike(f"%{search_query}%")
+        )
+    ).order_by(Recipe.date_posted.desc()).all()
+    
+    # Convert difficulty numbers to text
+    for rec in recipes:
+        if rec.difficulty == 1:
+            rec.difficulty = "Lätt"
+        elif rec.difficulty == 2:
+            rec.difficulty = "Medel"
+        elif rec.difficulty == 3:
+            rec.difficulty = "Svårt"
+    
+    return render_template("index.html", isAuthorized=isAuthorized, recipes=recipes, 
+                         search_query=search_query, search_results_count=len(recipes))
+
+
 @app.route("/add", methods=["GET", "POST"])
 def add_recipe():
     user_id = session.get("user_id")

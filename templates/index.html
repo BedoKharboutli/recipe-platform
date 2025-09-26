@@ -1,35 +1,174 @@
 {% extends "base.html" %} {% block body %}
-<br />
 
-<div class="row row-cols-1 row-cols-md-2 g-4 cards-container">
-  <!-- For loop to list all recipes -->
-  {% for recipe in recipes %}
-
-  <div
-    class="card"
-    style="
-      width: 18rem;
-      height: 22.5rem;
-      border-radius: 20px;
-      background-color: rgb(255, 255, 255);
-    "
-  >
-    <div class="card-body">
-      <img
-        src="{{ recipe.image }}"
-        class="card-img-top"
-        alt="{{ recipe.title }}"
-        style="margin-bottom: 5px; position: relative; height: 180px"
-      />
-      <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="post-link">
-        <h3 style="font-size: x-large; color: black" class="card-title">
-          {{ recipe.title }}
-        </h3>
-      </a>
-      <p>Portioner: {{ recipe.portions }}</p>
+<!-- Hero Section (only on homepage) -->
+{% if not search_query and not category_name %}
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-content text-center">
+      <h1 class="hero-title">Upptäck Smakfulla Recept</h1>
+      <p class="hero-subtitle">Från traditionella svenska rätter till internationella favoriter</p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <i class="fas fa-utensils"></i>
+          <span>{{ recipes|length }}+ Recept</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-users"></i>
+          <span>Matälskare</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-heart"></i>
+          <span>Gjort med kärlek</span>
+        </div>
+      </div>
     </div>
   </div>
-  {% endfor %}
-</div>
+</section>
+{% endif %}
+
+<!-- Recipes Section -->
+<section class="recipes-section">
+  <div class="container">
+    <div class="section-header text-center mb-5">
+      {% if search_query %}
+      <div class="search-header">
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary mb-3">
+          <i class="fas fa-arrow-left me-1"></i>Tillbaka till alla recept
+        </a>
+        <h2 class="section-title">Sökresultat för "{{ search_query }}"</h2>
+        <p class="section-subtitle">
+          {% if search_results_count == 0 %}
+          Inga recept hittades
+          {% elif search_results_count == 1 %}
+          1 recept hittat
+          {% else %}
+          {{ search_results_count }} recept hittade
+          {% endif %}
+        </p>
+      </div>
+      {% elif category_name %}
+      <div class="category-header">
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary mb-3">
+          <i class="fas fa-arrow-left me-1"></i>Tillbaka till alla recept
+        </a>
+        <h2 class="section-title">{{ category_name }} Recept</h2>
+        <p class="section-subtitle">Upptäck läckra {{ category_name|lower }} rätter</p>
+      </div>
+      {% else %}
+      <h2 class="section-title">Senaste Recepten</h2>
+      <p class="section-subtitle">Färska idéer från vårt kök till ditt</p>
+      {% endif %}
+    </div>
+    
+    <div class="recipes-grid">
+      {% for recipe in recipes %}
+      <div class="recipe-card">
+        <div class="recipe-image-container">
+          {% if recipe.image and recipe.image != 'None' %}
+          <img
+            src="{{ url_for('static', filename=recipe.image.split('static/')[-1]) }}"
+            class="recipe-image"
+            alt="{{ recipe.title }}"
+            loading="lazy"
+          />
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='pexels-ella-olsson-1640772.jpg') }}"
+            class="recipe-image"
+            alt="{{ recipe.title }}"
+            loading="lazy"
+          />
+          {% endif %}
+          <div class="recipe-overlay">
+            <div class="recipe-badges">
+              <span class="difficulty-badge difficulty-{{ recipe.difficulty|lower }}">
+                <i class="fas fa-star"></i>
+                {{ recipe.difficulty }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="recipe-content">
+          <div class="recipe-meta">
+            <span class="recipe-portions">
+              <i class="fas fa-users"></i>
+              {{ recipe.portions }} portioner
+            </span>
+            <span class="recipe-time">
+              <i class="fas fa-clock"></i>
+              30 min
+            </span>
+          </div>
+          
+          <h3 class="recipe-title">
+            <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="recipe-link">
+              {{ recipe.title }}
+            </a>
+          </h3>
+          
+          <p class="recipe-description">
+            En härlig rätt som passar perfekt för både vardag och fest.
+          </p>
+          
+          <div class="recipe-actions">
+            <a href="{{ url_for('recipe_detail', id=recipe.id) }}" class="btn btn-primary recipe-btn">
+              <i class="fas fa-eye me-1"></i>
+              Visa Recept
+            </a>
+            <button class="btn btn-outline-secondary favorite-btn" title="Lägg till favoriter">
+              <i class="fas fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+    {% if recipes|length == 0 %}
+    <div class="empty-state text-center">
+      {% if search_query %}
+      <i class="fas fa-search empty-icon"></i>
+      <h3>Inga recept hittades för "{{ search_query }}"</h3>
+      <p>Prova att söka med andra ord eller lägg till ett nytt recept!</p>
+      <div class="empty-actions">
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary me-2">
+          <i class="fas fa-plus me-1"></i>
+          Lägg till recept
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+          <i class="fas fa-home me-1"></i>
+          Visa alla recept
+        </a>
+      </div>
+      {% elif category_name %}
+      <i class="fas fa-utensils empty-icon"></i>
+      <h3>Inga {{ category_name|lower }} recept än</h3>
+      <p>Bli den första att dela ett fantastiskt {{ category_name|lower }} recept!</p>
+      <div class="empty-actions">
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary me-2">
+          <i class="fas fa-plus me-1"></i>
+          Lägg till recept
+        </a>
+        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+          <i class="fas fa-home me-1"></i>
+          Visa alla recept
+        </a>
+      </div>
+      {% else %}
+      <i class="fas fa-utensils empty-icon"></i>
+      <h3>Inga recept än</h3>
+      <p>Bli den första att dela ett fantastiskt recept!</p>
+      <div class="empty-actions">
+        <a href="{{ url_for('add_recipe') }}" class="btn btn-primary">
+          <i class="fas fa-plus me-1"></i>
+          Lägg till recept
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
 
 {% endblock %}
